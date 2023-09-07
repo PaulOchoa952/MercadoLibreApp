@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-09-2023 a las 01:12:56
--- Versión del servidor: 10.4.27-MariaDB
--- Versión de PHP: 8.2.0
+-- Tiempo de generación: 07-09-2023 a las 07:02:56
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,6 +32,7 @@ CREATE TABLE `productos` (
   `nombre` varchar(200) NOT NULL,
   `descripcion` text NOT NULL,
   `precio` decimal(10,0) NOT NULL,
+  `descuento` tinyint(3) NOT NULL DEFAULT 0,
   `id_categoria` int(11) NOT NULL,
   `activo` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish_ci;
@@ -40,10 +41,10 @@ CREATE TABLE `productos` (
 -- Volcado de datos para la tabla `productos`
 --
 
-INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `id_categoria`, `activo`) VALUES
-(1, 'Zapatos color cafe.', 'Zapatos color cafe.', '599', 1, 1),
-(2, 'Laptop gamer.', 'Laptop gamer.', '20000', 1, 1),
-(3, 'Smartphone Samsung.', 'Smartphone Samsung.', '4389', 1, 1);
+INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `descuento`, `id_categoria`, `activo`) VALUES
+(1, 'Zapatos color cafe.', 'Zapatos color cafe.', 599, 10, 1, 1),
+(2, 'Laptop gamer.', 'Laptop gamer.', 20000, 0, 1, 1),
+(3, 'Smartphone Samsung.', 'Smartphone Samsung.', 4389, 0, 1, 1);
 
 --
 -- Índices para tablas volcadas
