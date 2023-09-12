@@ -7,7 +7,7 @@ $db = new Database();
 $con = $db->conectar();
 
 $json = file_get_contents('php://input');
-$datos = json_decode(json, true);
+$datos = json_decode($json, true);
 
 
 if(is_array($datos)){
@@ -44,6 +44,7 @@ if ($id > 0) {
                     precio, cantidad ) VALUES (?, ?, ?, ?, ?)");
                     $sql_insert->execute([$id, $clave, $row_prod['nombre'], $precio_desc, $cantidad]);
         }
+        include 'enviar_email.php';
     }
     unset($_SESSION['carrito']);
 }

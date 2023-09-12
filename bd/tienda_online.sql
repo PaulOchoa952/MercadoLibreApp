@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-09-2023 a las 07:02:56
+-- Tiempo de generación: 12-09-2023 a las 08:48:52
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -20,6 +20,37 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `tienda_online`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `compra`
+--
+
+CREATE TABLE `compra` (
+  `id` int(11) NOT NULL,
+  `id_transaccion` varchar(20) NOT NULL,
+  `fecha` datetime NOT NULL,
+  `status` varchar(20) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `id_cliente` varchar(20) NOT NULL,
+  `total` decimal(10,0) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `detalle_compra`
+--
+
+CREATE TABLE `detalle_compra` (
+  `id` int(11) NOT NULL,
+  `id_compra` int(11) NOT NULL,
+  `id_producto` int(11) NOT NULL,
+  `nombre` varchar(200) NOT NULL,
+  `precio` decimal(10,2) NOT NULL,
+  `cantidad` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -51,6 +82,18 @@ INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `descuento`, `
 --
 
 --
+-- Indices de la tabla `compra`
+--
+ALTER TABLE `compra`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `detalle_compra`
+--
+ALTER TABLE `detalle_compra`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `productos`
 --
 ALTER TABLE `productos`
@@ -59,6 +102,18 @@ ALTER TABLE `productos`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `compra`
+--
+ALTER TABLE `compra`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_compra`
+--
+ALTER TABLE `detalle_compra`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
