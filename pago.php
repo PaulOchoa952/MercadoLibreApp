@@ -3,6 +3,11 @@
 
   require 'config/config.php';
   require 'config/database.php';
+  require 'vendor/autoload.php';
+  MercadoPago\SDK::setAccessToken(TOKEN_MP);
+
+  $preference = new MercadoPago\Preference();
+  $productos_mp = array();
   $db = new Database();
   $con = $db->conectar();
 
@@ -42,6 +47,9 @@
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" 
     crossorigin="anonymous">
     <link href="css/estilos.css" rel="stylesheet">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo CLIENT_ID; ?>&currency=<?php echo CURRENCY;
+    ?>"></script>
 </head>
 <body>
 <!-- Paul implemento el header de boostrap -->
@@ -83,64 +91,95 @@
         <div class ="row">
             <div class="col-6">
                 <h4>Detalles de Pago</h4>
-                <div id="paypal-button-container"></div>
-    </div>
+                <div class ="row">
+                      <div class="col-12">
+                        <div id="paypal-button-container"></div>
+                      </div>
+                </div>
+
+                <div class ="row">
+                      <div class="col-12">
+                        <div class="checkout-btn"></div>
+                      </div>
+                </div>
+            </div>
             <div class="col-6">
                 <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Subtotal</th>
-                        <th></th>
-                    </tr>
-                </thead>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
 
-                <tbody>
-                    <?php if($lista_carrito == null){
-                        echo '<tr><td colspan="5" class="text-center"><b>No hay productos en el carrito</b></td></tr>';
-                    }else{
-                        $total = 0;
-                        foreach($lista_carrito as $producto){
-                            $_id = $producto['id'];
-                            $nombre = $producto['nombre'];
-                            $precio = $producto['precio'];
-                            $cantidad = $producto['cantidad'];
-                            $descuento = $producto['descuento'];
-                            $precio_desc = $precio - (($precio * $descuento) / 100);
-                            $subtotal = $precio_desc * $cantidad;
-                            $total += $subtotal;
+                        <tbody>
+                            <?php 
+                                if($lista_carrito == null){
+                                    echo '<tr><td colspan="5" class="text-center"><b>No hay productos en el carrito</b></td></tr>';
+                                }else{
+                                    $total = 0;
+                                    foreach($lista_carrito as $producto){
+                                        $_id = $producto['id'];
+                                        $nombre = $producto['nombre'];
+                                        $precio = $producto['precio'];
+                                        $cantidad = $producto['cantidad'];
+                                        $descuento = $producto['descuento'];
+                                        $precio_desc = $precio - (($precio * $descuento) / 100);
+                                        $subtotal = $precio_desc * $cantidad;
+                                        $total += $subtotal;
 
-                        ?>
-                    <tr>
-                        <td><?php echo $nombre; ?></td>
-                        <td>
-                            <div id="subtotal_<?php echo $_ide; ?>" name="subtotal[]"><?php echo MONEDA . number_format($subtotal,2,'.',','); ?></div>
-                        </td>
-                    </tr>
-                    <?php }?>
-                    <tr>
-                        <td colspan="2"><p class= "h3 text-end" id="total" ><?php echo MONEDA . number_format($total,2,'.',','); ?></p></td>
-                    </tr>
-                 <?php }?>
-                    
-                 
-                </tbody>
-            </table>
+                                        $item = new MercadoPago\Item();
+                                        $item->id = $_id;
+                                        $item->title = $nombre;
+                                        $item->quantity = $cantidad;
+                                        $item->unit_price = $precio_desc;
+                                        $item->currency_id = "MXN";
+                                        array_push($productos_mp,$item);
+                                        unset($item);
+                                    ?>
+                                <tr>
+                                    <td><?php echo $nombre; ?></td>
+                                    <td>
+                                        <div id="subtotal_<?php echo $_ide; ?>" name="subtotal[]"><?php echo MONEDA . number_format($subtotal,2,'.',','); ?></div>
+                                    </td>
+                                </tr>
+                                <?php }?>
+                                <tr>
+                                    <td colspan="2"><p class= "h3 text-end" id="total" ><?php echo MONEDA . number_format($total,2,'.',','); ?></p></td>
+                                </tr>
+                            <?php }?>
+                            
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
-        </div>
-    </div>
+    
 
 </main>
+
+<?php
+    $preference->items =$productos_mp;
+    $preference->back_urls = array(
+        "success" => "http://localhost/MercadoLibreApp/captura.php",
+        "failure" => "http://localhost/MercadoLibreApp/fallo.php"
+    );
+    $preference->auto_return = "approved";
+    $preference->binary_mode = true;
+
+     $preference->save();
+?>
 
 <!--Murgo-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
     crossorigin="anonymous"></script>
 
-    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo CLIENT_ID; ?>&currency=<?php echo CURRENCY;
-    ?>"></script>
+    
 
 <script>
         paypal.Buttons({
@@ -181,6 +220,20 @@
                 console.log(data);
             }
         }).render('#paypal-button-container')
+
+        const mp = new MercadoPago('TEST-2ae8a428-f617-4088-9390-9df5dff14530', {
+            locale: 'es-MX'
+        });
+
+        mp.checkout({
+            preference: {
+                id: '<?php echo $preference->id; ?>'
+            },
+            render: {
+                container: '.checkout-btn',
+                label: 'Pagar con Mercado Pago'
+            }
+        })
     </script>
 </body>
 </html>
